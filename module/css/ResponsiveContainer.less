@@ -6,7 +6,9 @@
 @slider: slider;
 @maxPanes: 3;
 @ANIMATION_DURATION: 0.7s;
+@SCALING_ANIMATION_DURATION: 0.2s;
 @ANIMATION_STYLE:  ease-in-out;
+
 @slidePaneWidth: 275px;
 @widthPartialView: (@slidePaneWidth+40); // 40 is the visible part of the view under the slide
 
@@ -27,6 +29,14 @@
 	-o-transition: all @ANIMATION_DURATION @ANIMATION_STYLE;
 	transition: all @ANIMATION_DURATION @ANIMATION_STYLE;
 }
+
+.transform-transition() {
+	-moz-transition: -moz-transform @SCALING_ANIMATION_DURATION @ANIMATION_STYLE;
+	-webkit-transition: -webkit-transform @SCALING_ANIMATION_DURATION @ANIMATION_STYLE;
+	-o-transition: -o-tranform @SCALING_ANIMATION_DURATION @ANIMATION_STYLE;
+	transition: transform @SCALING_ANIMATION_DURATION @ANIMATION_STYLE;
+}
+
 .transform(...) {
 	-moz-transform: @arguments;
 	-webkit-transform: @arguments;
@@ -140,16 +150,50 @@
 	/* Animations */
 
 	/* generating the class needed for the transitions */
-	@i: 1;
-	.while (@i) when (@i =< @maxPanes) {
-		#@{slider}.col@{i} {
-			@tmp: (100*(@maxPanes+1)/@i);
-			width: ~"@{tmp}%";
-		}	
-		.while(@i+1);
+//	@i: 1;
+//	.while (@i) when (@i =< @maxPanes) {
+//		#@{slider}.col@{i} {
+//			@tmp: (100*(@maxPanes+1)/@i);
+//			width: ~"@{tmp}%";
+//		}
+//		.while(@i+1);
+//	}
+//	.while(@i);
+	.scaleX-transform(@scalex){
+		-webkit-transform: scaleX(@scalex);
+		-webkit-transform-origin: 0% 0%;
+		-o-transform: scaleX(@scalex);
+		-o-transform-origin: 0% 0%;
+		-moz-transform: scaleX(@scalex);
+		-moz-transform-origin: 0% 0%;
+		transform: scaleX(@scalex);
+		transform-origin: 0% 0%;
 	}
-	.while(@i);
 
+	// Hardcoded column transition classes
+	/* *********************************************** */
+	#slider.col1 {
+		width: 400%;
+	}
+	#slider.col1T {
+		width: 200%;
+		.scaleX-transform(2);
+	}
+	#slider.col2 {
+		width: 200%;
+		.scaleX-transform(1);
+	}
+	#slider.col2T {
+		width: 133.33333333333334%;
+		.scaleX-transform(1.5);	}
+	#slider.col3 {
+		width: 133.33333333333334%;
+		.scaleX-transform(1);
+	}
+	#slider.col3T {
+		width: 100%;
+		.scaleX-transform(1.333333333333);	}
+	/* *********************************************** */
 
 	#@{slider}.slideTransition {
 		.transform(translateX((-100%/(@maxPanes+1))));
@@ -157,7 +201,7 @@
 	}
 
 	#@{slider}.widthTransition {
-		.transition();
+		.transform-transition();
 	}
 	
 	#multiPanes.overlayed.sideTransition {

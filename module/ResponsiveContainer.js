@@ -146,7 +146,17 @@ define([
 			}
 			return (domNode !== null) ? true : false; 
 		},
-		
+		_clearTransitionClasses: function(){
+			var classno = "";
+			var classtr = "";
+			for(var i=1; i<=this._multiPanes.maxPanes; i++){
+				classno = "col" + i;
+				classtr = classno + "T";
+				if(domClass.contains(this._multiPanes.slider, classtr)){
+					domClass.replace(this._multiPanes.slider, classno, classtr);
+				}
+			}
+		},
 		display: function(e){
 			var viewId = e.detail.viewId;
 			if(!viewId){return;}
@@ -196,12 +206,15 @@ define([
 						this._cbMap["slideTransition"].end(this._multiPanes.slider, "slideTransition");
 					}
 					// Compression transition
-					if(animate && (this._multiPanes.currentDepth <= currentMaxPanes)){ 
-						this._startTransition(this._multiPanes.slider, "widthTransition"); //the transition is listening for the new class colX
+					if(animate && (this._multiPanes.currentDepth <= currentMaxPanes)){
+						var curclass = "col" + (this._multiPanes.maxPanes,this._multiPanes.currentDepth-1).toString();
+						domClass.replace(this._multiPanes.slider, curclass + "T", curclass);
+						setTimeout(lang.hitch(this, function(){
+							this._startTransition(this._multiPanes.slider, "widthTransition");
+							domClass.add(this._multiPanes.slider, "col"+Math.min(this._multiPanes.maxPanes,this._multiPanes.currentDepth));}), 0);
+					}else{
+						domClass.add(this._multiPanes.slider, "col"+Math.min(this._multiPanes.maxPanes,this._multiPanes.currentDepth));
 					}
-					
-					domClass.add(this._multiPanes.slider, "col"+Math.min(this._multiPanes.maxPanes,this._multiPanes.currentDepth));
-		
 				}else if(this._multiPanes.currentDepth > depth){ //remove depth level
 					var step = this._multiPanes.currentDepth - depth;
 					var i = 0;
@@ -313,6 +326,7 @@ define([
 		},
 
 		_endTransition: function(node, transition, option){
+			this._clearTransitionClasses();
 			this._cbMap[transition].status = false;
 			if(this._cbMap[transition].end){
 				this._cbMap[transition].end(node, transition, option);
